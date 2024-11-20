@@ -4,7 +4,10 @@ enum CameraFacing {
   front(0),
 
   /// Back facing camera.
-  back(1);
+  back(1),
+
+  /// External camera.
+  external(2);
 
   const CameraFacing(this.rawValue);
 
@@ -14,6 +17,8 @@ enum CameraFacing {
         return CameraFacing.front;
       case 1:
         return CameraFacing.back;
+      case 2:
+        return CameraFacing.external;
       default:
         throw ArgumentError.value(value, 'value', 'Invalid raw value.');
     }

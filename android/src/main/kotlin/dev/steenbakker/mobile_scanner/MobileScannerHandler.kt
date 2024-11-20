@@ -5,8 +5,10 @@ import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import android.util.Size
+import androidx.annotation.OptIn
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ExperimentalGetImage
+import androidx.camera.core.ExperimentalLensFacing
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import dev.steenbakker.mobile_scanner.objects.BarcodeFormats
 import dev.steenbakker.mobile_scanner.objects.DetectionSpeed
@@ -128,6 +130,7 @@ class MobileScannerHandler(
         }
     }
 
+    @OptIn(ExperimentalLensFacing::class)
     @ExperimentalGetImage
     private fun start(call: MethodCall, result: MethodChannel.Result) {
         val torch: Boolean = call.argument<Boolean>("torch") ?: false
@@ -146,8 +149,12 @@ class MobileScannerHandler(
 
         val barcodeScannerOptions: BarcodeScannerOptions? = buildBarcodeScannerOptions(formats)
 
-        val position =
-            if (facing == 0) CameraSelector.DEFAULT_FRONT_CAMERA else CameraSelector.DEFAULT_BACK_CAMERA
+        val position = when (facing) {
+            0 -> CameraSelector.DEFAULT_FRONT_CAMERA
+            1 -> CameraSelector.DEFAULT_BACK_CAMERA
+            2 -> CameraSelector.Builder().requireLensFacing(CameraSelector.LENS_FACING_EXTERNAL).build()
+            else -> CameraSelector.DEFAULT_BACK_CAMERA
+        }
 
         val detectionSpeed: DetectionSpeed = when (speed) {
             0 -> DetectionSpeed.NO_DUPLICATES
